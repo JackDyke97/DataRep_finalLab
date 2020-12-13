@@ -4,9 +4,12 @@ const port = 4000;
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
+const path = require('path');
+
+
 //so we use cors every time
 app.use(cors());
-
+//allows us to access teh sql functions
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,POST, PUT, DELETE, OPTIONS");
@@ -16,6 +19,9 @@ app.use(function (req, res, next) {
   );
   next();
 });
+//configuration lines for where we find out build folder and static files
+app.use(express.static(path.join(__dirname,'../build')));
+app.use('/static', express.static(path.join(__dirname, 'build//static')))
 
 app.use(bodyParser.urlencoded({extended: false}))
 
@@ -82,7 +88,7 @@ app.get("/api/movies/:id", (req, res) => {
        res.json(data);
      })
 })
-
+//method that finds the id from the database and allows us to edit them on the app
 app.put('/api/movies/:id', (req, res)=>{
   console.log("Update movie: "+req.params.id);
   console.log(req.body);
@@ -92,7 +98,7 @@ app.put('/api/movies/:id', (req, res)=>{
       res.send(data);
     })
 })
-
+//method that find the id from the database and deletes it.
 app.delete('/api/movies/:id', (req, res)=>{
   console.log("Delete Movie: "+req.params.id);
 
@@ -118,8 +124,12 @@ app.post('/api/movies', (req,res)=>{
 
   res.send("Item added");
 });
+//send the index.html file when it gets a html get request
+app.get('*', (req,res) =>{
+  res.sendFile(path.join(__dirname+'/../build/index.html'));
+});
 
-
+//which port the app is running on, i.e, 4000
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
